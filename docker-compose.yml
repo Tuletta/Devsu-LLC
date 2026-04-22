@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bank_postgres
+    environment:
+      POSTGRES_DB: bancadevsu
+      POSTGRES_USER: devsu
+      POSTGRES_PASSWORD: devsu123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/main/resources/BaseDatos.sql:/docker-entrypoint-initdb.d/1-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devsu -d bancadevsu"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bank_backend
+    ports:
+      - "8081:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=bancadevsu
+      - DB_USER=devsu
+      - DB_PASS=devsu123
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bank_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
