@@ -1,0 +1,20 @@
+# Java
+backend/target/
+*.class
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.log
+
+# Docker
+.docker/
+
+# Gemini / Antigravity
+.gemini/
+antigravity/
